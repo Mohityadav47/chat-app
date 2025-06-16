@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat App</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+</head>
+<body>
+  <div class="chat-box">
+    <h2>Chat Room</h2>
+
+    <!-- Username input -->
+    <div id="username-section">
+      <input id="username" placeholder="Enter your name">
+      <button onclick="setUsername()">Join Chat</button>
+    </div>
+
+    <!-- Chat area (hidden initially) -->
+    <div id="chat-section" style="display:none;">
+      <div id="messages"></div>
+      <input id="message" placeholder="Type your message with 😊🔥">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    var socket = io();
+    var username = "";
+
+    function setUsername() {
+      const input = document.getElementById('username').value.trim();
+      if (input) {
+        username = input;
+        document.getElementById('username-section').style.display = 'none';
+        document.getElementById('chat-section').style.display = 'block';
+      }
+    }
+
+    function sendMessage() {
+      const msg = document.getElementById('message').value;
+      if (msg.trim() !== "") {
+        socket.send({ user: username, text: msg });
+        document.getElementById('message').value = '';
+      }
+    }
+
+    socket.on('message', function(data) {
+      let p = document.createElement('p');
+      p.innerHTML = `<strong>${data.user}:</strong> ${data.text}`;
+      document.getElementById('messages').appendChild(p);
+    });
+  </script>
+</body>
+</html>
+
